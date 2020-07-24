@@ -49,11 +49,11 @@ returns dictionary of usernames and user ids"""
 #copy all html to the clipboard, run macro
 #in report view will be 25 username / userid keys
 #uncomment the next 3 lines and run
-url = getClipText()
-userDict = parseHtml(url)
-Msg(str(userDict))
-userDict.update(dict1)
-Msg(str(dict1))
+#url = getClipText()
+#userDict = parseHtml(url)
+#Msg(str(userDict))
+#userDict.update(dict1)
+#Msg(str(dict1))
 Msg("\npinger macro -- "+str(len(dict1.keys()))+" users in database.  Edit source code to add more.\n")
 
 items = []
