@@ -15,6 +15,7 @@ dict1 = {'chrisb': '5646', 'NormandC': '202', 'wmayer': '69', 'yorik': '68', 'be
 'agima2': '12024'
 
 }
+
 def getClipText():
     clip = QtGui.QClipboard()
     return clip.text(QtGui.QClipboard.Clipboard)
@@ -56,20 +57,43 @@ returns dictionary of usernames and user ids"""
 #Msg(str(dict1))
 Msg("\npinger macro -- "+str(len(dict1.keys()))+" users in database.  Edit source code to add more.\n")
 
+#werner's code to get FreeCAD About information
+class AboutInfo(QtCore.QObject):
+  def eventFilter(self, obj, ev):
+    if obj.metaObject().className() == "Gui::Dialog::AboutDialog":
+      if ev.type() == ev.ChildPolished:
+        print(obj.metaObject().className())
+        mo = obj.metaObject()
+        index = mo.indexOfMethod("on_copyButton_clicked()")
+        if index > 0:
+          mo.invokeMethod(obj, "on_copyButton_clicked")
+          QtGui.qApp.postEvent(obj, QtGui.QCloseEvent())
+    
+    return False
+
+ai=AboutInfo()
+QtGui.qApp.installEventFilter(ai)
+Gui.runCommand("Std_About")
+QtGui.qApp.removeEventFilter(ai)
+about_info = getClipText()
+
 items = []
 for k in dict1.keys():
     #Msg(str(k))
     items.append(k)
     pass
-items = ["select user to ping"] + sorted(items[:limitToTopNUsers], key=str.casefold)
+items = ["select user to ping","copy FreeCAD about info"] + sorted(items[:limitToTopNUsers], key=str.casefold)
 username,ok = QtGui.QInputDialog.getItem(QtGui.QMainWindow(),"Select user", "Select user:\n\n\
 WARNING: (Will replace current clipboard contents.)\n\n\
 Tip: Enter first letter in name to skip through the list.\n\
 ",items,0,0)
 
-if ok and username != items[0]:
+if ok and username != items[0] and username != items[1]:
     ping = "[quote="+username+" user_id="+dict1[username]+"]\npinged by pinger macro\n[/quote]"
     setClipText(ping)
     FreeCAD.Console.PrintMessage("Success!\n\nNow copied to clipboard: \n\n"+ping)
+elif ok and username == items[1]:
+    setClipText(about_info)
+    FreeCAD.Console.PrintMessage("Success!\n\nFreeCAD About info copied to clipboard:\n\n"+about_info)
 else:
     Msg("\npinger macro: User canceled\n")
