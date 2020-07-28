@@ -6,7 +6,7 @@
     <title>Pinger</title>
 </head>
 <body>
-    FreeCAD forum Pinger v1.3 -- Javascript version<br/>
+    FreeCAD forum Pinger v1.4 -- Javascript version<br/>
     <br/>
     <form id="myform">
         <select id="myselect" onchange="createPingText()"></select>
@@ -73,6 +73,23 @@ go here
                 ls.setItem("localUserCount", localCount.toString());
             }
             setupUI();
+        }
+    }
+
+    function addThisUser(person,userid) {
+        var ls = window.localStorage;
+        var localCount = Number(ls.getItem("localUserCount"));
+        if (person != null) {
+            while (isReserved(person)) { //unlikely case username is reserved word
+                person = person + "_";
+            };
+            if (userid != null) {
+                //window.alert("adding user:" + person + ":" + userid);
+                localCount++;
+                removeUser(person);//harmless if person not already in storage
+                ls.setItem(person, userid);
+                ls.setItem("localUserCount", localCount.toString());
+            }
         }
     }
 
@@ -153,7 +170,14 @@ go here
     }
     function ping() {
         var mytextarea = document.getElementById("mytextarea");
+        var saved = mytextarea.value;
         setClipText(mytextarea.value);
+        var myselect = document.getElementById("myselect");
+        var opt = myselect.selectedOptions[0];
+        addThisUser(opt.text, opt.value); //add to local storage so it shows up early in the list
+
+        setupUI();
+        mytextarea.value = saved + '-->(copied)';
     }
 
     function removeOptions(selectElement) {
@@ -191,6 +215,11 @@ go here
         for (var ii = 0; ii < localUsers.length; ii++) {
             myselect.appendChild(localUsers[ii]);
         }
+        firstOpt = document.createElement("OPTION");
+        firstOpt.setAttribute("value", "0");
+        firstKey = document.createTextNode('-------');
+        firstOpt.appendChild(firstKey);
+        myselect.appendChild(firstOpt);
         for (var key in dict2) {
             var value = dict2[key];
             var opt = document.createElement("OPTION");
