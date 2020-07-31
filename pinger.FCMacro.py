@@ -48,8 +48,7 @@ def getAboutInfo():
 about = getAboutInfo()
 setClipText(about)
 
-<<<<<<< HEAD
-    
+   
 Msg("\npinger macro -- "+str(len(dict1.keys()))+" users in database.  Edit source code to add more.\n")
 
 items = []
