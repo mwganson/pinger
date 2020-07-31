@@ -67,7 +67,7 @@ if ok and username != items[0] and username != items[1]:
     setClipText(ping)
     FreeCAD.Console.PrintMessage("Success!\n\nNow copied to clipboard: \n\n"+ping)
 elif ok and username == items[1]:
-=======
+
     folder = os.path.dirname(os.path.realpath(__file__))
     fullpath = (folder+'\pinger.html').replace('\\','/')
     browser = Web.QWebEngineView()
@@ -82,7 +82,6 @@ elif ok and username == items[1]:
     settings.setAttribute(Web.QWebEngineSettings.JavascriptCanPaste, True)
     settings.setAttribute(Web.QWebEngineSettings.FullScreenSupportEnabled, True)
     browser.show()
->>>>>>> a0748291bf54469a736b6026df2aedb56d23f3b7
 
     setClipText(getAboutInfo())
     FreeCAD.Console.PrintMessage("Success!\n\nFreeCAD About info copied to clipboard:\n\n"+about)
