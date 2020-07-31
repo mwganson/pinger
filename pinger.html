@@ -6,7 +6,7 @@
     <title>Pinger</title>
 </head>
 <body>
-    FreeCAD forum Pinger v1.5 -- Javascript version<br />
+    FreeCAD forum Pinger v1.51 -- Javascript version<br />
     <br />
     <form id="myform">
         <select id="myselect" onchange="createPingText()"></select>
@@ -22,7 +22,6 @@ go here
         <button type="button" id="add" onclick="addUser();" title="add new user">+</button>
         <button type="button" id="remove" onclick="removeUserWithPrompt()" title="remove added user">-</button>
     </form>
-    <textarea id="ta_about" style="display:none;"> </textarea>
     <script>
         //## adapted from
         //## Pinger macro
@@ -50,10 +49,6 @@ go here
 
         function setClipText(txt) {
             var promise = navigator.clipboard.writeText(txt);
-        }
-        function getClipText() {
-            var ta_about = document.getElementById('ta_about'); //freecad about info if run from the macro
-            navigator.clipboard.readText().then(text => ta_about.innerText = text);
         }
 
         function clearLocalStorage() {
@@ -208,7 +203,6 @@ go here
             setupUI();
         }
         function setupUI() {
-            getClipText();
             ls = window.localStorage;
             var elem = document.getElementById("limitUsers");
             elem.value = ls.getItem('limit');

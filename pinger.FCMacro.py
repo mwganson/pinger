@@ -54,8 +54,6 @@ setClipText(about)
 modifiers = QtGui.QApplication.keyboardModifiers()
 if modifiers == QtCore.Qt.ShiftModifier:
 
-
-
     folder = os.path.dirname(os.path.realpath(__file__))
     fullpath = (folder+'\pinger.html').replace('\\','/')
     browser = Web.QWebEngineView()
