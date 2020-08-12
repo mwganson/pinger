@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-## Pinger macro v1.5
+## Pinger macro v1.61
 ## By: TheMarkster
-#  2020.07.22
+#  2020.08.12
 ## Aids in pinging users on the forum
 ## Select the user from the list and paste clipboard contents into the forum
 
@@ -25,7 +25,7 @@ def setClipText(txt):
     clip = QtGui.QClipboard()
     clip.setText(txt)
 
-#werner's code to get FreeCAD About information
+#werner's code to get about info
 class AboutInfo(QtCore.QObject):
   def eventFilter(self, obj, ev):
     if obj.metaObject().className() == "Gui::Dialog::AboutDialog":
@@ -67,23 +67,7 @@ if ok and username != items[0] and username != items[1]:
     setClipText(ping)
     FreeCAD.Console.PrintMessage("Success!\n\nNow copied to clipboard: \n\n"+ping)
 elif ok and username == items[1]:
-
-    folder = os.path.dirname(os.path.realpath(__file__))
-    fullpath = (folder+'\pinger.html').replace('\\','/')
-    browser = Web.QWebEngineView()
-#    with open(fullpath, encoding='utf-8') as f:
-#        data = f.readlines()
-#    html = ''.join(data)
-    browser.load(fullpath)
-    #browser.setHtml(html)
-    browser.resize(390,175)
-    settings = browser.settings()
-    settings.setAttribute(Web.QWebEngineSettings.JavascriptCanAccessClipboard, True)
-    settings.setAttribute(Web.QWebEngineSettings.JavascriptCanPaste, True)
-    settings.setAttribute(Web.QWebEngineSettings.FullScreenSupportEnabled, True)
-    browser.show()
-
-    setClipText(getAboutInfo())
+    setClipText(about)
     FreeCAD.Console.PrintMessage("Success!\n\nFreeCAD About info copied to clipboard:\n\n"+about)
 else:
     Msg("\npinger macro: User canceled\n")
