@@ -6,7 +6,7 @@
     <title>Pinger</title>
 </head>
 <body>
-    FreeCAD forum Pinger v1.51 -- Javascript version<br />
+    FreeCAD forum Pinger v1.6 -- Javascript version<br />
     <br />
     <form id="myform">
         <select id="myselect" onchange="createPingText()"></select>
@@ -16,11 +16,12 @@
 Code for pinging user will 
 go here
         </textarea><br />
-        Limit Users: <input type="text" id="limitUsers" value=Number.MAX_SAFE_INTEGER.toString() size="2" />
+        Limit Users: <input type="text" id="limitUsers" value="20000" size="2" />
         <button id="setlimit" onclick="limit_users()" title="limit number of users shown sorted by posts count (not counting added users)">Set Limit</button>
         <button type="button" id="maxbutton" onclick="setMax();" title="show all users">All Users</button>
         <button type="button" id="add" onclick="addUser();" title="add new user">+</button>
-        <button type="button" id="remove" onclick="removeUserWithPrompt()" title="remove added user">-</button>
+        <button type="button" id="remove" onclick="removeUserWithPrompt()" title="remove added user">-</button><br/>
+        <p id="statusbar"></p>
     </form>
     <script>
         //## adapted from
@@ -47,51 +48,73 @@ go here
             return reserved.indexOf(txt) >= 0;
         }
 
+        function msg(txt) {
+            statusbar = document.getElementById("statusbar");
+            statusbar.innerHTML = txt + "<br/><br/>" + statusbar.innerHTML;
+        }
+
         function setClipText(txt) {
-            var promise = navigator.clipboard.writeText(txt);
+            try{
+                var promise = navigator.clipboard.writeText(txt);
+                msg(txt + " has been successfully copied to the clipboard");
+            } catch (err) {
+                msg("Failed to write to clipboard.  Check security settings.");
+            }
         }
 
         function clearLocalStorage() {
-            var sanityCheck = window.confirm("Clear all local storage?  This will remove all new users you've added with the add user tool.");
-            if (sanityCheck != null) {
-                window.localStorage.clear();
-                window.localStorage.setItem("limit", Number.MAX_SAFE_INTEGER.toString());
-                limit_users();
+            if (!hasLocalStorage) {
+                msg("Browser denies local storage.  Check security settings.");
+            } else {
+                var sanityCheck = window.confirm("Clear all local storage?  This will remove all new users you've added with the add user tool.");
+                if (sanityCheck != null) {
+                    window.localStorage.clear();
+                    window.localStorage.setItem("limit", Number.MAX_SAFE_INTEGER.toString());
+                    limit_users();
+                }
             }
         }
         function addUser() {
-            var ls = window.localStorage;
-            var localCount = Number(ls.getItem("localUserCount"));
-            var person = prompt("Please enter userame", "");
-            if (person != null) {
-                while (isReserved(person)) { //unlikely case username is reserved word
-                    person = person + "_";
-                };
-                var userid = prompt("Please enter userid for " + person, "");
-                if (userid != null) {
-                    //window.alert("adding user:" + person + ":" + userid);
-                    localCount++;
-                    removeUser(person);//harmless if person not already in storage
-                    ls.setItem(person, userid);
-                    ls.setItem("localUserCount", localCount.toString());
+            if (!hasLocalStorage) {
+              // msg("Browser denies local storage.  Check security settings.");
+            } else {
+                var ls = window.localStorage;
+                var localCount = Number(ls.getItem("localUserCount"));
+                var person = prompt("Please enter userame", "");
+                if (person != null) {
+                    while (isReserved(person)) { //unlikely case username is reserved word
+                        person = person + "_";
+                    };
+                    var userid = prompt("Please enter userid for " + person, "");
+                    if (userid != null) {
+                        //window.alert("adding user:" + person + ":" + userid);
+                        localCount++;
+                        removeUser(person);//harmless if person not already in storage
+                        ls.setItem(person, userid);
+                        ls.setItem("localUserCount", localCount.toString());
+                    }
+                    setupUI();
                 }
-                setupUI();
             }
         }
 
         function addThisUser(person, userid) {
-            var ls = window.localStorage;
-            var localCount = Number(ls.getItem("localUserCount"));
-            if (person != null) {
-                while (isReserved(person)) { //unlikely case username is reserved word
-                    person = person + "_";
-                };
-                if (userid != null) {
-                    //window.alert("adding user:" + person + ":" + userid);
-                    localCount++;
-                    removeUser(person);//harmless if person not already in storage
-                    ls.setItem(person, userid);
-                    ls.setItem("localUserCount", localCount.toString());
+            if (!hasLocalStorage) {
+               //msg("Browser denies local storage.  Check security settings.");
+            } else {
+                var ls = window.localStorage;
+                var localCount = Number(ls.getItem("localUserCount"));
+                if (person != null) {
+                    while (isReserved(person)) { //unlikely case username is reserved word
+                        person = person + "_";
+                    };
+                    if (userid != null) {
+                        //window.alert("adding user:" + person + ":" + userid);
+                        localCount++;
+                        removeUser(person);//harmless if person not already in storage
+                        ls.setItem(person, userid);
+                        ls.setItem("localUserCount", localCount.toString());
+                    }
                 }
             }
         }
@@ -125,7 +148,6 @@ go here
             };
         }
         function fetchUsersFromLocalStorage() {
-            //window.alert("fetchUsersFromLocalStorage() not implemented yet");
             var ls = window.localStorage;
             var count = ls.length;
             var newUsers = [];
@@ -135,7 +157,6 @@ go here
             } else if (count == 2) { //no new uers yet
                 return newUsers;
             } else {
-                //window.alert("count = " + count.toString());
                 var localCount = Number(ls.getItem("localUserCount"));
                 var sorted = [];
                 for (var i in ls) {
@@ -180,7 +201,7 @@ go here
             addThisUser(opt.text, opt.value); //add to local storage so it shows up early in the list
 
             setupUI();
-            mytextarea.value = saved + '-->(copied)';
+         //   mytextarea.value = saved + '-->(copied)';
         }
 
         function removeOptions(selectElement) {
@@ -191,20 +212,24 @@ go here
         }
 
         function limit_users() {
-            ls = window.localStorage;
             var elem = document.getElementById("limitUsers");
             var limit = Number(elem.value);
             var dict1_length = Object.keys(dict1).length;
             limitToTopNUsers = limit <= dict1_length ? limit : dict1_length;
-            elem.value = limitToTopNUsers;
-            ls.setItem('limit', limitToTopNUsers.toString());
+            elem.value = limitToTopNUsers.toString();
+            if (hasLocalStorage) {
+                ls = window.localStorage;
+                ls.setItem('limit', limitToTopNUsers.toString());
+            }
             setupUI();
         }
         function setupUI() {
-            ls = window.localStorage;
             var elem = document.getElementById("limitUsers");
-            elem.value = ls.getItem('limit');
-            limitToTopNUsers = elem.value;
+            if (hasLocalStorage) {
+                ls = window.localStorage;
+                elem.value = ls.getItem('limit');
+            } 
+            limitToTopNUsers = Number(elem.value);
             dict2 = sortOnKeys(dict1);
             var myselect = document.getElementById("myselect");
             removeOptions(myselect);
@@ -214,9 +239,11 @@ go here
             var firstKey = document.createTextNode('Select user from list');
             firstOpt.appendChild(firstKey);
             myselect.appendChild(firstOpt);
-            var localUsers = fetchUsersFromLocalStorage(); //list of options
-            for (var ii = 0; ii < localUsers.length; ii++) {
-                myselect.appendChild(localUsers[ii]);
+            if (hasLocalStorage) {
+                var localUsers = fetchUsersFromLocalStorage(); //list of options
+                for (var ii = 0; ii < localUsers.length; ii++) {
+                    myselect.appendChild(localUsers[ii]);
+                }
             }
             firstOpt = document.createElement("OPTION");
             firstOpt.setAttribute("value", "0");
@@ -231,7 +258,7 @@ go here
                 opt.appendChild(t);
                 myselect.appendChild(opt);
             };
-            createPingText();
+          //  createPingText();
         }
 
 
@@ -256,6 +283,15 @@ go here
             };
 
             return tempDict;
+        }
+        var hasLocalStorage = true;
+        try {
+            ls = window.localStorage;
+        } catch (err) {
+            hasLocalStorage = false;
+            elem = document.getElementById("limitUsers");
+            elem.value = "500";
+            msg("no local storage, setting limit to top 500 users <br/> click \"All Users\" to use them all");
         }
         setupUI();
 
