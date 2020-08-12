@@ -35,14 +35,14 @@ class AboutInfo(QtCore.QObject):
         index = mo.indexOfMethod("on_copyButton_clicked()")
         if index > 0:
           mo.invokeMethod(obj, "on_copyButton_clicked")
-          QtGui.qApp.postEvent(obj, QtGui.QCloseEvent())
+          QtGui.QApplication.instance().postEvent(obj, QtGui.QCloseEvent())
     return False
 
 def getAboutInfo():
     ai=AboutInfo()
-    QtGui.qApp.installEventFilter(ai)
+    QtGui.QApplication.instance().installEventFilter(ai)
     Gui.runCommand("Std_About")
-    QtGui.qApp.removeEventFilter(ai)
+    QtGui.QApplication.instance().removeEventFilter(ai)
     return getClipText()
 
 about = getAboutInfo()
