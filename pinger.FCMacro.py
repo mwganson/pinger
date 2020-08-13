@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-## Pinger macro v1.61
+## Pinger macro v1.62
 ## By: TheMarkster
 #  2020.08.12
 ## Aids in pinging users on the forum
@@ -62,11 +62,11 @@ WARNING: (Will replace current clipboard contents.)\n\n\
 Tip: Begin typing the name in the combo box.\n""",
 items,0,editable=True)
 
-if ok and username != items[0] and username != items[1]:
+if ok and username != items[0]: #0 is about info
     ping = "[quote="+username+" user_id="+dict1[username]+"]\npinged by pinger macro\n[/quote]"
     setClipText(ping)
     FreeCAD.Console.PrintMessage("Success!\n\nNow copied to clipboard: \n\n"+ping)
-elif ok and username == items[1]:
+elif ok and username == items[0]:
     setClipText(about)
     FreeCAD.Console.PrintMessage("Success!\n\nFreeCAD About info copied to clipboard:\n\n"+about)
 else:
