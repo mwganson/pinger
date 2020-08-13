@@ -27,28 +27,28 @@ def setClipText(txt):
 
 #werner's code to get about info
 class AboutInfo(QtCore.QObject):
-  def eventFilter(self, obj, ev):
-    if obj.metaObject().className() == "Gui::Dialog::AboutDialog":
-      if ev.type() == ev.ChildPolished:
-       # print(obj.metaObject().className())
-        mo = obj.metaObject()
-        index = mo.indexOfMethod("on_copyButton_clicked()")
-        if index > 0:
-          mo.invokeMethod(obj, "on_copyButton_clicked")
-          QtGui.QApplication.instance().postEvent(obj, QtGui.QCloseEvent())
-    return False
+
+    def __init__(self):
+        super(AboutInfo, self).__init__()
+
+    def eventFilter(self, obj, ev):
+        if obj.metaObject().className() == "Gui::Dialog::AboutDialog" and\
+        ev.type() == ev.ChildPolished and\
+        hasattr(obj, 'on_copyButton_clicked'):
+            obj.on_copyButton_clicked()
+            QtGui.QApplication.instance().postEvent(obj, QtGui.QCloseEvent())
+        return False
 
 def getAboutInfo():
     ai=AboutInfo()
     QtGui.QApplication.instance().installEventFilter(ai)
     Gui.runCommand("Std_About")
     QtGui.QApplication.instance().removeEventFilter(ai)
+    del ai
     return getClipText()
 
 about = getAboutInfo()
-setClipText(about)
 
-   
 Msg("\npinger macro -- "+str(len(dict1.keys()))+" users in database.  Edit source code to add more.\n")
 
 items = []
@@ -56,7 +56,7 @@ for k in dict1.keys():
     #Msg(str(k))
     items.append(k)
     pass
-items = ["select user to ping","copy FreeCAD about info"] + sorted(items[:limitToTopNUsers], key=str.casefold)
+items = ["Copy FreeCAD about info"] + sorted(items[:limitToTopNUsers], key=str.casefold)
 username,ok = QtGui.QInputDialog.getItem(QtGui.QMainWindow(),"Select user", """Select user:\n\n\
 WARNING: (Will replace current clipboard contents.)\n\n\
 Tip: Begin typing the name in the combo box.\n""",
