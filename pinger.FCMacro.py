@@ -27,22 +27,24 @@ def setClipText(txt):
 
 #werner's code to get about info
 class AboutInfo(QtCore.QObject):
-  def eventFilter(self, obj, ev):
-    if obj.metaObject().className() == "Gui::Dialog::AboutDialog":
-      if ev.type() == ev.ChildPolished:
-       # print(obj.metaObject().className())
-        mo = obj.metaObject()
-        index = mo.indexOfMethod("on_copyButton_clicked()")
-        if index > 0:
-          mo.invokeMethod(obj, "on_copyButton_clicked")
-          QtGui.QApplication.instance().postEvent(obj, QtGui.QCloseEvent())
-    return False
+
+    def __init__(self):
+        super(AboutInfo, self).__init__()
+
+    def eventFilter(self, obj, ev):
+        if obj.metaObject().className() == "Gui::Dialog::AboutDialog" and\
+        ev.type() == ev.ChildPolished and\
+        hasattr(obj, 'on_copyButton_clicked'):
+            obj.on_copyButton_clicked()
+            QtGui.QApplication.instance().postEvent(obj, QtGui.QCloseEvent())
+        return False
 
 def getAboutInfo():
     ai=AboutInfo()
     QtGui.QApplication.instance().installEventFilter(ai)
     Gui.runCommand("Std_About")
     QtGui.QApplication.instance().removeEventFilter(ai)
+    del ai
     return getClipText()
 
 about = getAboutInfo()
