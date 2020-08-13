@@ -56,7 +56,7 @@ for k in dict1.keys():
     #Msg(str(k))
     items.append(k)
     pass
-items = ["select user to ping","copy FreeCAD about info"] + sorted(items[:limitToTopNUsers], key=str.casefold)
+items = ["Copy FreeCAD about info"] + sorted(items[:limitToTopNUsers], key=str.casefold)
 username,ok = QtGui.QInputDialog.getItem(QtGui.QMainWindow(),"Select user", """Select user:\n\n\
 WARNING: (Will replace current clipboard contents.)\n\n\
 Tip: Begin typing the name in the combo box.\n""",
