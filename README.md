@@ -22,3 +22,5 @@ Note: Although, there is a [PR](https://github.com/phpbb/phpbb/pull/5225) in the
 `git pull`
 
 There is also a `pinger.html` file if you want to run the javascript version, which has the nice feature of allowing you to add custom users and stores them as a sort of cookie in localstorage inside your browser.
+
+Note: User chrisb has made some changes to the user interface allowing for multiple selection, which I have uploaded as `pinger2.html`.
