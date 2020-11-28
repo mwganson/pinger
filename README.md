@@ -19,4 +19,4 @@ This change enables you to update the macro by opening a git bash terminal in th
 
 <pre>git pull</pre>
 
-There is also a pinger.html file if you want to run the javascript version, which has the nice feature of allowing you to add custom users and stores them as a sort of cookie in localstorage inside your browser.
+There is also a pinger.html file if you want to run the javascript version, which has the nice feature of allowing you to add custom users and stores them as a sort of cookie in localstorage inside your browser.  User chrisb has made some changes to the user interface allowing for multiple selection, which I have uploaded as pinger2.html.
